@@ -39,6 +39,10 @@ DESCRIPTION = "Crops: growth stage & ripeness, easy to distinguish"
 # 26.2 までは "shade": false、26.3 からは "shade_direction_override": "up"（バニラ block/crop と同じ）。
 # 未知のキーは無視されるので両方書いておけばどちらの版でも効く。
 NO_SHADE = {"shade": False, "shade_direction_override": "up"}
+
+# 成熟モデルの要素に付ける最低明るさ（0–15）。バニラ block/cross_emissive と同じ書き方で、1.21.11 と 26.x の両方で読まれる。
+# 15 にすると夜や屋根の下でも、収穫可の作物だけが最大の明るさで描かれる。
+GLOW = {"light_emission": 15}
 MC_BS = ROOT / "assets" / "minecraft" / "blockstates"
 MODELS = ROOT / "assets" / NS / "models" / "block"
 TEX = ROOT / "assets" / NS / "textures" / "block"
@@ -268,10 +272,10 @@ def mature_tex(name: str, color, motif, pulse: bool):
 
 
 # ---- モデル生成 -----------------------------------------------------------
-def crop_planes(tex_ref: str, y0: float, y1: float):
-    """バニラ block/crop と同じ # 配置の 4 枚板。"""
+def crop_planes(tex_ref: str, y0: float, y1: float, glow: bool = False):
+    """バニラ block/crop と同じ # 配置の 4 枚板。glow=True で夜も光る。"""
     def plane(frm, to, faces):
-        return {"from": frm, "to": to, **NO_SHADE, "faces": faces}
+        return {"from": frm, "to": to, **NO_SHADE, **(GLOW if glow else {}), "faces": faces}
     uv_n = [0, 0, 16, 16]
     uv_r = [16, 0, 0, 16]
     return [
@@ -282,9 +286,9 @@ def crop_planes(tex_ref: str, y0: float, y1: float):
     ]
 
 
-def cap_plane(tex_ref: str, y: float):
+def cap_plane(tex_ref: str, y: float, glow: bool = False):
     return {
-        "from": [0, y, 0], "to": [16, y, 16], **NO_SHADE,
+        "from": [0, y, 0], "to": [16, y, 16], **NO_SHADE, **(GLOW if glow else {}),
         "faces": {"up": {"uv": [0, 0, 16, 16], "texture": tex_ref}, "down": {"uv": [0, 0, 16, 16], "texture": tex_ref}},
     }
 
@@ -301,15 +305,15 @@ def write_model(name: str, model: dict):
     (MODELS / f"{name}.json").write_text(dumps(model), newline="\n")
 
 
-def bar_model(name: str, side_tex: str, cap_tex: str | None, cap_y: float | None, y0=-1, y1=15):
+def bar_model(name: str, side_tex: str, cap_tex: str | None, cap_y: float | None, y0=-1, y1=15, glow: bool = False):
     model = {
         "ambientocclusion": False,
         "textures": {"particle": f"{NS}:block/{side_tex}", "side": f"{NS}:block/{side_tex}"},
-        "elements": crop_planes("#side", y0, y1),
+        "elements": crop_planes("#side", y0, y1, glow),
     }
     if cap_tex is not None:
         model["textures"]["cap"] = f"{NS}:block/{cap_tex}"
-        model["elements"].append(cap_plane("#cap", cap_y))
+        model["elements"].append(cap_plane("#cap", cap_y, glow))
     write_model(name, model)
 
 
@@ -321,6 +325,7 @@ def write_blockstate(block: str, variants: dict):
 # ---- 作物ごとの生成 -------------------------------------------------------
 def gen_bar_crop(block: str, spec: dict):
     ages, color, motif, pulse = spec["ages"], spec["color"], spec["motif"], spec["pulse"]
+    glow = spec.get("glow", pulse)   # 既定では明滅する作物＝夜も光る作物（茎は実を待つ間ずっと光ってしまうので除外）
     max_age = ages - 1
     variants = {}
     for age in spec.get("only_ages", range(ages)):
@@ -330,7 +335,7 @@ def gen_bar_crop(block: str, spec: dict):
         if age == max_age:
             mature_tex(side, color, motif, pulse)
             mature_tex(cap, color, motif, pulse)
-            bar_model(f"{block}_{age}", side, cap, 15)
+            bar_model(f"{block}_{age}", side, cap, 15, glow=glow)
         else:
             h, s = bar_height(p), cap_size(p)
             remaining = max_age - age
@@ -377,11 +382,12 @@ def gen_cocoa():
                 draw_digit(img, 2 - age, (sx0 + sx1) // 2 + 1, sy0 + 5, WHITE, GREEN_DK)
             save_tex(tex, img)
         frm, to = g["box"]
+        glow = GLOW if age == 2 else {}
         model = {
             "ambientocclusion": False,
             "textures": {"particle": f"{NS}:block/{tex}", "cocoa": f"{NS}:block/{tex}"},
             "elements": [
-                {"from": frm, "to": to, **NO_SHADE, "faces": {
+                {"from": frm, "to": to, **NO_SHADE, **glow, "faces": {
                     "up": {"uv": g["top"], "texture": "#cocoa"},
                     "down": {"uv": g["top"], "texture": "#cocoa"},
                     "north": {"uv": g["side"], "texture": "#cocoa"},
@@ -389,7 +395,7 @@ def gen_cocoa():
                     "west": {"uv": g["side"], "texture": "#cocoa"},
                     "east": {"uv": g["side"], "texture": "#cocoa"},
                 }},
-                {"from": [8, 12, 12], "to": [8, 16, 16], **NO_SHADE, "faces": {
+                {"from": [8, 12, 12], "to": [8, 16, 16], **NO_SHADE, **glow, "faces": {
                     "west": {"uv": [12, 0, 16, 4], "texture": "#cocoa"},
                     "east": {"uv": [16, 0, 12, 4], "texture": "#cocoa"},
                 }},
@@ -416,8 +422,8 @@ def gen_pitcher():
         if age == max_age:
             mature_tex("pitcher_crop_side", color, "checker", True)
             mature_tex("pitcher_crop_cap", color, "checker", True)
-            bar_model(f"pitcher_crop_lower_{age}", "pitcher_crop_side", None, None)
-            bar_model(f"pitcher_crop_upper_{age}", "pitcher_crop_side", "pitcher_crop_cap", 16, y0=0, y1=16)
+            bar_model(f"pitcher_crop_lower_{age}", "pitcher_crop_side", None, None, glow=True)
+            bar_model(f"pitcher_crop_upper_{age}", "pitcher_crop_side", "pitcher_crop_cap", 16, y0=0, y1=16, glow=True)
         else:
             H = round(4 + 28 * p)          # 2 ブロック合計の棒の高さ
             hl, hu = min(H, 16), max(H - 16, 0)

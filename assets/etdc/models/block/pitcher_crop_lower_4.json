@@ -10,6 +10,7 @@
       "to": [4, 15, 16],
       "shade": false,
       "shade_direction_override": "up",
+      "light_emission": 15,
       "faces": {
         "west": {
           "uv": [0, 0, 16, 16],
@@ -26,6 +27,7 @@
       "to": [12, 15, 16],
       "shade": false,
       "shade_direction_override": "up",
+      "light_emission": 15,
       "faces": {
         "west": {
           "uv": [16, 0, 0, 16],
@@ -42,6 +44,7 @@
       "to": [16, 15, 4],
       "shade": false,
       "shade_direction_override": "up",
+      "light_emission": 15,
       "faces": {
         "north": {
           "uv": [0, 0, 16, 16],
@@ -58,6 +61,7 @@
       "to": [16, 15, 12],
       "shade": false,
       "shade_direction_override": "up",
+      "light_emission": 15,
       "faces": {
         "north": {
           "uv": [16, 0, 0, 16],
