@@ -26,6 +26,19 @@ from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parent.parent
 NS = "etdc"
+
+# pack.mcmeta の互換範囲（リソースパック形式の major）。1.21.11=75, 26.1=84, 26.2=88, 26.3=97。
+# 新しい版で「古いバージョン向け」と警告が出たら MAX_FORMAT を上げて再生成する。
+# min_format の major が 64 を超えるパックでは supported_formats を書くとエラーになり、pack_format は省略できる
+# （26.2/26.3 の PackFormat.validate を逆アセンブルして確認、2026-09-21）。
+MIN_FORMAT = 75
+MAX_FORMAT = 97
+DESCRIPTION = "Crops: growth stage & ripeness, easy to distinguish"
+
+# 陰影を消して面の向きに関係なく同じ明るさにする。
+# 26.2 までは "shade": false、26.3 からは "shade_direction_override": "up"（バニラ block/crop と同じ）。
+# 未知のキーは無視されるので両方書いておけばどちらの版でも効く。
+NO_SHADE = {"shade": False, "shade_direction_override": "up"}
 MC_BS = ROOT / "assets" / "minecraft" / "blockstates"
 MODELS = ROOT / "assets" / NS / "models" / "block"
 TEX = ROOT / "assets" / NS / "textures" / "block"
@@ -258,7 +271,7 @@ def mature_tex(name: str, color, motif, pulse: bool):
 def crop_planes(tex_ref: str, y0: float, y1: float):
     """バニラ block/crop と同じ # 配置の 4 枚板。"""
     def plane(frm, to, faces):
-        return {"from": frm, "to": to, "shade": False, "faces": faces}
+        return {"from": frm, "to": to, **NO_SHADE, "faces": faces}
     uv_n = [0, 0, 16, 16]
     uv_r = [16, 0, 0, 16]
     return [
@@ -271,7 +284,7 @@ def crop_planes(tex_ref: str, y0: float, y1: float):
 
 def cap_plane(tex_ref: str, y: float):
     return {
-        "from": [0, y, 0], "to": [16, y, 16], "shade": False,
+        "from": [0, y, 0], "to": [16, y, 16], **NO_SHADE,
         "faces": {"up": {"uv": [0, 0, 16, 16], "texture": tex_ref}, "down": {"uv": [0, 0, 16, 16], "texture": tex_ref}},
     }
 
@@ -368,7 +381,7 @@ def gen_cocoa():
             "ambientocclusion": False,
             "textures": {"particle": f"{NS}:block/{tex}", "cocoa": f"{NS}:block/{tex}"},
             "elements": [
-                {"from": frm, "to": to, "shade": False, "faces": {
+                {"from": frm, "to": to, **NO_SHADE, "faces": {
                     "up": {"uv": g["top"], "texture": "#cocoa"},
                     "down": {"uv": g["top"], "texture": "#cocoa"},
                     "north": {"uv": g["side"], "texture": "#cocoa"},
@@ -376,7 +389,7 @@ def gen_cocoa():
                     "west": {"uv": g["side"], "texture": "#cocoa"},
                     "east": {"uv": g["side"], "texture": "#cocoa"},
                 }},
-                {"from": [8, 12, 12], "to": [8, 16, 16], "shade": False, "faces": {
+                {"from": [8, 12, 12], "to": [8, 16, 16], **NO_SHADE, "faces": {
                     "west": {"uv": [12, 0, 16, 4], "texture": "#cocoa"},
                     "east": {"uv": [16, 0, 12, 4], "texture": "#cocoa"},
                 }},
@@ -469,10 +482,20 @@ def gen_legend():
     sheet.save(PREVIEW / "legend.png")
 
 
+def gen_pack_mcmeta():
+    """min_format/max_format は単一整数で書く（max を [97, 0] のような配列にすると 97.1 の 26.3 が「古い」扱いになる）。"""
+    (ROOT / "pack.mcmeta").write_text(dumps({"pack": {
+        "description": DESCRIPTION,
+        "min_format": MIN_FORMAT,
+        "max_format": MAX_FORMAT,
+    }}))
+
+
 def main():
     for p in (MC_BS, MODELS, TEX):
         if p.exists():
             shutil.rmtree(p)
+    gen_pack_mcmeta()
     for block, spec in CROPS.items():
         gen_bar_crop(block, spec)
     gen_cocoa()

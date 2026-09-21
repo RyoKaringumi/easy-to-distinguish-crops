@@ -1,8 +1,7 @@
 {
   "pack": {
-    "pack_format": 88,
-    "min_format": [75, 0],
-    "max_format": [999, 0],
-    "description": "Crops: growth stage & ripeness, easy to distinguish"
+    "description": "Crops: growth stage & ripeness, easy to distinguish",
+    "min_format": 75,
+    "max_format": 97
   }
 }

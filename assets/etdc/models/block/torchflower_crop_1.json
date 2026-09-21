@@ -10,6 +10,7 @@
       "from": [4, -1, 0],
       "to": [4, 15, 16],
       "shade": false,
+      "shade_direction_override": "up",
       "faces": {
         "west": {
           "uv": [0, 0, 16, 16],
@@ -25,6 +26,7 @@
       "from": [12, -1, 0],
       "to": [12, 15, 16],
       "shade": false,
+      "shade_direction_override": "up",
       "faces": {
         "west": {
           "uv": [16, 0, 0, 16],
@@ -40,6 +42,7 @@
       "from": [0, -1, 4],
       "to": [16, 15, 4],
       "shade": false,
+      "shade_direction_override": "up",
       "faces": {
         "north": {
           "uv": [0, 0, 16, 16],
@@ -55,6 +58,7 @@
       "from": [0, -1, 12],
       "to": [16, 15, 12],
       "shade": false,
+      "shade_direction_override": "up",
       "faces": {
         "north": {
           "uv": [16, 0, 0, 16],
@@ -70,6 +74,7 @@
       "from": [0, 8, 0],
       "to": [16, 8, 16],
       "shade": false,
+      "shade_direction_override": "up",
       "faces": {
         "up": {
           "uv": [0, 0, 16, 16],

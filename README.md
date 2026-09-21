@@ -65,9 +65,11 @@ Minecraft → 設定 → リソースパック → 「Crops: growth stage & ripe
 
 ## 対応バージョン
 
-- 作成・確認時点の対象: **26.2（リソースパック形式 88.0）**。26.3 系でも同じ構造。
-- `pack.mcmeta` には `min_format` / `max_format` を広めに書いてあるので、1.21.11（形式 75）以降ならそのまま読める。古いバージョンでは「互換性なし」と警告が出るが、そのまま有効化しても作物ブロックの定義が同じ範囲では動く。
-- 前提として、作物の blockstate プロパティ（`age`、cocoa の `facing`、pitcher_crop の `half`）はバニラの定義をそのまま使っている。
+- 対象: **1.21.11（リソースパック形式 75）〜 26.3（形式 97.1）**。`pack.mcmeta` は `min_format: 75` / `max_format: 97`。
+- 作物の blockstate（`age`、cocoa の `facing`、pitcher_crop の `half`）は 1.21.4〜26.3 で同一なので、この範囲では同じ定義で動く。
+- 26.3 でモデル要素の `shade` キーが `shade_direction_override` に置き換わった。このパックのモデルは両方書いてあり（未知のキーは無視される）、26.2 以前でも 26.3 でも陰影なしで描かれる。
+- 26.4 以降で「古いバージョン向け」と警告が出たら、そのまま有効化しても大抵は動く。警告を消すには `tools/gen.py` の `MAX_FORMAT` を上げて再生成する。
+- `min_format` の major が 64 を超えるパックでは `supported_formats` を書くとエラーになり、`pack_format` は省略できる（26.2/26.3 の検証コードで確認）。
 
 ## 仕組み
 
