@@ -81,7 +81,11 @@ No vanilla textures or models are included; the pack only references vanilla blo
 git clone https://github.com/RyoKaringumi/easy-to-distinguish-crops.git "$env:APPDATA\.minecraft\resourcepacks\easy-to-distinguish-crops"
 ```
 
-更新するときは同じフォルダで `git pull`。
+更新は次の 1 行（どのフォルダにいても動く）。ゲーム起動中なら、そのあと F3+T でリソースパックを再読み込みすれば再起動不要。
+
+```powershell
+git -C "$env:APPDATA\.minecraft\resourcepacks\easy-to-distinguish-crops" pull
+```
 
 ### 方法 B: ZIP をダウンロード
 
