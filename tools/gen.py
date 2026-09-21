@@ -253,7 +253,7 @@ def save_tex(name: str, img: Image.Image, pulse: bool = False):
     img.save(TEX / f"{name}.png")
     meta = TEX / f"{name}.png.mcmeta"
     if pulse:
-        meta.write_text(dumps({"animation": {"interpolate": True, "frametime": 10, "frames": [0, 1]}}))
+        meta.write_text(dumps({"animation": {"interpolate": True, "frametime": 10, "frames": [0, 1]}}), newline="\n")
     elif meta.exists():
         meta.unlink()
 
@@ -298,7 +298,7 @@ def dumps(obj) -> str:
 
 def write_model(name: str, model: dict):
     MODELS.mkdir(parents=True, exist_ok=True)
-    (MODELS / f"{name}.json").write_text(dumps(model))
+    (MODELS / f"{name}.json").write_text(dumps(model), newline="\n")
 
 
 def bar_model(name: str, side_tex: str, cap_tex: str | None, cap_y: float | None, y0=-1, y1=15):
@@ -315,7 +315,7 @@ def bar_model(name: str, side_tex: str, cap_tex: str | None, cap_y: float | None
 
 def write_blockstate(block: str, variants: dict):
     MC_BS.mkdir(parents=True, exist_ok=True)
-    (MC_BS / f"{block}.json").write_text(dumps({"variants": variants}))
+    (MC_BS / f"{block}.json").write_text(dumps({"variants": variants}), newline="\n")
 
 
 # ---- 作物ごとの生成 -------------------------------------------------------
@@ -488,7 +488,7 @@ def gen_pack_mcmeta():
         "description": DESCRIPTION,
         "min_format": MIN_FORMAT,
         "max_format": MAX_FORMAT,
-    }}))
+    }}), newline="\n")
 
 
 def main():
