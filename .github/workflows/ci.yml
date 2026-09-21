@@ -1,0 +1,22 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pillow
+      - name: Regenerate and check that the committed JSON matches the generator
+        run: |
+          python tools/gen.py
+          git diff --exit-code -- '*.json' '*.mcmeta'
+      - name: Check blockstate -> model -> texture references
+        run: python tools/validate.py

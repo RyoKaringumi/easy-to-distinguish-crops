@@ -1,0 +1,25 @@
+name: release
+
+# タグ v* を push すると、パックの zip を組んで GitHub Release に添付する。
+#   git tag v1.0.0 && git push origin v1.0.0
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the pack zip (pack.mcmeta at the zip root)
+        run: |
+          NAME="easy-to-distinguish-crops-${GITHUB_REF_NAME}"
+          zip -r "${NAME}.zip" pack.mcmeta pack.png assets LICENSE README.md
+          echo "ZIP=${NAME}.zip" >> "$GITHUB_ENV"
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ZIP }}
+          generate_release_notes: true
