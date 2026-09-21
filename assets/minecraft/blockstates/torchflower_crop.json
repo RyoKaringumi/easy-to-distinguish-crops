@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "age=0": {
+      "model": "etdc:block/torchflower_crop_0"
+    },
+    "age=1": {
+      "model": "etdc:block/torchflower_crop_1"
+    }
+  }
+}

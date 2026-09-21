@@ -1,0 +1,6 @@
+{
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "etdc:block/pitcher_crop_cap_1"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "age=0": {
+      "model": "etdc:block/potatoes_0"
+    },
+    "age=1": {
+      "model": "etdc:block/potatoes_1"
+    },
+    "age=2": {
+      "model": "etdc:block/potatoes_2"
+    },
+    "age=3": {
+      "model": "etdc:block/potatoes_3"
+    },
+    "age=4": {
+      "model": "etdc:block/potatoes_4"
+    },
+    "age=5": {
+      "model": "etdc:block/potatoes_5"
+    },
+    "age=6": {
+      "model": "etdc:block/potatoes_6"
+    },
+    "age=7": {
+      "model": "etdc:block/potatoes_7"
+    }
+  }
+}
